@@ -4,6 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.example.castingCloud.dto.request.auth.ActorSignUpDto;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,4 +22,11 @@ public class ActorEntity {
     private String actorPassword;
     private String actorNickName;
     private String actorProfile;
+
+    public ActorEntity(ActorSignUpDto dto) {
+        this.actorEmail = dto.getActorEmail();
+        this.actorPassword = dto.getActorPassword();
+        this.actorNickName = dto.getActorNickName();
+        this.actorProfile = dto.getActorEmail();
+    }
 }
