@@ -7,11 +7,14 @@ import org.springframework.stereotype.Service;
 
 import com.example.castingCloud.common.ResponseMessage;
 import com.example.castingCloud.dto.request.auth.ActorSignUpDto;
+import com.example.castingCloud.dto.request.auth.DirectorSignUpDto;
 import com.example.castingCloud.dto.response.ActorSignUpResponseDto;
+import com.example.castingCloud.dto.response.DirectorSignUpResponseDto;
 import com.example.castingCloud.dto.response.ResponseDto;
 import com.example.castingCloud.entity.ActorEntity;
 import com.example.castingCloud.provider.TokenProvider;
 import com.example.castingCloud.repository.ActorRepository;
+import com.example.castingCloud.repository.DirectorRepository;
 import com.example.castingCloud.service.AuthService;
 
 @Service
@@ -22,11 +25,14 @@ public class AuthServiceImplements implements AuthService {
     @Autowired
     private ActorRepository actorRepository;
 
+
     private static final String DEFAULT_NICKNAME = "user";
+
+    private static final String E = null;
     
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public ResponseDto<ActorSignUpResponseDto> signUp(ActorSignUpDto dto) {
+    public ResponseDto<ActorSignUpResponseDto> actorSignUp(ActorSignUpDto dto) {
         ActorSignUpResponseDto data = null;
 
         String actorEmail = dto.getActorEmail();
@@ -67,5 +73,28 @@ public class AuthServiceImplements implements AuthService {
         }
 
         return newActorNickName;
+    }
+
+    @Autowired
+    private DirectorRepository directorRepository; 
+
+    public ResponseDto<DirectorSignUpResponseDto> directorSignUp(DirectorSignUpDto dto) {
+        DirectorSignUpResponseDto data = null;
+
+        String directorEmail = dto.getDirectorEmail();
+        String directorPassword = dto.getDirectorPassword();
+        String directorName = dto.getDirectorName();
+        int directorPhoneNumber = dto.getDirectorPhoneNumber();
+        String directorCompany = dto.getDirectorCompany();
+        
+        try {
+            boolean hasDirectorEmail = directorRepository.existsByDirectorEmail(directorEmail);
+            if(hasDirectorEmail) return ResponseDto.setFailed(ResponseMessage.EXIST_EMAIL);
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return ResponseDto.setFailed(ResponseMessage.DATABASE_ERROR);
+        }
+        return ResponseDto.setSuccess(ResponseMessage.SUCCESS, data);
     }
 }
