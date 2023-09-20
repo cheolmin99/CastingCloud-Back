@@ -12,6 +12,7 @@ import com.example.castingCloud.dto.response.ActorSignUpResponseDto;
 import com.example.castingCloud.dto.response.DirectorSignUpResponseDto;
 import com.example.castingCloud.dto.response.ResponseDto;
 import com.example.castingCloud.entity.ActorEntity;
+import com.example.castingCloud.entity.DirectorEntity;
 import com.example.castingCloud.provider.TokenProvider;
 import com.example.castingCloud.repository.ActorRepository;
 import com.example.castingCloud.repository.DirectorRepository;
@@ -90,6 +91,23 @@ public class AuthServiceImplements implements AuthService {
         try {
             boolean hasDirectorEmail = directorRepository.existsByDirectorEmail(directorEmail);
             if(hasDirectorEmail) return ResponseDto.setFailed(ResponseMessage.EXIST_EMAIL);
+
+            String encodePassword  = passwordEncoder.encode(directorPassword);
+            dto.setDirectorPassword(encodePassword);
+
+            boolean hasDirectorName = directorRepository.existsByDirectorName(directorName);
+            if(hasDirectorName) return ResponseDto.setFailed(ResponseMessage.EXIST_NAME);
+
+            boolean hasDirectorPhoneNumber = directorRepository.existsByDirectorPhoneNumber(directorPhoneNumber);
+            if(hasDirectorPhoneNumber)  return ResponseDto.setFailed(ResponseMessage.EXIST_PHONE_NUMBER);
+
+            boolean hasDirectorCompany = directorRepository.existsByDirectorCompany(directorCompany);
+            if(hasDirectorCompany) return ResponseDto.setFailed(ResponseMessage.EXIST_COMPANY);
+
+            DirectorEntity directorEntity = new DirectorEntity(dto);
+            directorRepository.save(directorEntity);
+
+            data = new DirectorSignUpResponseDto(true);
 
         } catch (Exception exception) {
             exception.printStackTrace();
