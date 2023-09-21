@@ -1,4 +1,4 @@
-package com.example.castingCloud.dto.response;
+package com.example.castingCloud.dto.response.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
