@@ -6,10 +6,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.castingCloud.common.ResponseMessage;
+import com.example.castingCloud.dto.request.auth.ActorSignInDto;
 import com.example.castingCloud.dto.request.auth.ActorSignUpDto;
+import com.example.castingCloud.dto.request.auth.DirectorSignInDto;
 import com.example.castingCloud.dto.request.auth.DirectorSignUpDto;
 import com.example.castingCloud.dto.response.ResponseDto;
+import com.example.castingCloud.dto.response.auth.ActorSignInResponseDto;
 import com.example.castingCloud.dto.response.auth.ActorSignUpResponseDto;
+import com.example.castingCloud.dto.response.auth.DirectorSignInResponseDto;
 import com.example.castingCloud.dto.response.auth.DirectorSignUpResponseDto;
 import com.example.castingCloud.entity.ActorEntity;
 import com.example.castingCloud.entity.DirectorEntity;
@@ -115,4 +119,67 @@ public class AuthServiceImplements implements AuthService {
         }
         return ResponseDto.setSuccess(ResponseMessage.SUCCESS, data);
     }
+
+    public ResponseDto<ActorSignInResponseDto> actorSignIn(ActorSignInDto dto) {
+        ActorSignInResponseDto data = null;
+
+        String actorEmail = dto.getActorEmail();
+        String actorPassword = dto.getActorPassword();
+
+        ActorEntity actorEntity = null;
+
+        try {
+            actorEntity = actorRepository.findByActorEmail(actorEmail);
+            if (actorEmail == null)
+            return ResponseDto.setFailed(ResponseMessage.FAIL_SIGN_IN);
+
+            boolean isEqualPassword = passwordEncoder.matches(actorPassword, actorEntity.getActorPassword());
+            if (!isEqualPassword)
+            return ResponseDto.setFailed(ResponseMessage.DATABASE_ERROR);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return ResponseDto.setFailed(ResponseMessage.DATABASE_ERROR);
+        }
+
+        try {
+            String token = tokenProvider.create(actorEmail);
+            data = new ActorSignInResponseDto(actorEntity, token);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return ResponseDto.setFailed(ResponseMessage.DATABASE_ERROR);
+        }
+        return ResponseDto.setSuccess(ResponseMessage.SUCCESS, data);
+    }
+
+    public ResponseDto<DirectorSignInResponseDto> directorSignIn(DirectorSignInDto dto) {
+        DirectorSignInResponseDto data = null;
+
+        String directorEmail = dto.getDirectorEmail();
+        String directorPassword = dto.getDirectorPassword();
+
+        DirectorEntity directorEntity = null;
+
+        try {
+            directorEntity = directorRepository.findByDirectorEmail(directorEmail);
+            if (directorEmail == null)
+            return ResponseDto.setFailed(ResponseMessage.FAIL_SIGN_IN);
+
+            boolean isEqualPassword = passwordEncoder.matches(directorPassword, directorEntity.getDirectorPassword());
+            if (!isEqualPassword)
+            return ResponseDto.setFailed(ResponseMessage.DATABASE_ERROR);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return ResponseDto.setFailed(ResponseMessage.DATABASE_ERROR);
+        }
+
+        try {
+            String token = tokenProvider.create(directorEmail);
+            data = new DirectorSignInResponseDto(directorEntity, token);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return ResponseDto.setFailed(ResponseMessage.DATABASE_ERROR);
+        }
+        return ResponseDto.setSuccess(ResponseMessage.SUCCESS, data);
+    }
+    
 }
